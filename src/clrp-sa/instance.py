@@ -2,19 +2,18 @@
 
 import math
 
-from typing import List, Dict, Tuple
+from typing import Dict, List, Tuple
 
 from node import Node
 from customer import Customer
 from depot import Depot
-from logger import Logger
 
 
 class Instance:
     """Represents an instance for a CLRP Problem"""
 
-    def __init__(self, depots: List[Depot], customers: List[Customer], vehicle_capacity: int, route_setup_cost: int, logger: Logger) -> None:
-        self.logger: Logger = logger
+    def __init__(self, name: str, depots: List[Depot], customers: List[Customer], vehicle_capacity: int, route_setup_cost: int) -> None:
+        self.name: str = name
         self.depots: List[Depot] = depots
         self.customers: List[Customer] = customers
         self.size: int = len(self.depots) + len(self.customers)
@@ -44,7 +43,7 @@ class Instance:
         return self.distance_matrix.get((node1, node2), float('inf'))
 
     def print_distance_matrix(self) -> None:
-        """Prints distance matrix to console""" 
+        """Prints distance matrix to console"""
         print("Distance Matrix:")
         for (node1, node2), distance in self.distance_matrix.items():
             print(f"From {node1.name} to {node2.name}: {distance}")

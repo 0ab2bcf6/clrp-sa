@@ -8,6 +8,6 @@ class Customer(Node):
 
     type: NodeType = NodeType.CSTMR
 
-    def __init__(self, name: str, x: int, y: int, demand: int) -> None:
+    def __init__(self, name: str, x: float, y: float, demand: float) -> None:
         super().__init__(name, x, y)
-        self.demand: int = demand
+        self.demand: float = demand

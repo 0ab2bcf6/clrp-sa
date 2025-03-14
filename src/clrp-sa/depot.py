@@ -8,8 +8,9 @@ class Depot(Node):
 
     type: NodeType = NodeType.DPT
 
-    def __init__(self, name: str, x: int, y: int, cost: int, capacity: int = 10000000000) -> None:
+    def __init__(self, name: str, x: float, y: float, cost: float, capacity: float, route_setup: float) -> None:
         super().__init__(name, x, y)
-        self.cost: int = cost
-        self.capacity: int = capacity
+        self.cost: float = cost
+        self.capacity: float = capacity
+        self.route_setup: float = route_setup
         self.open: bool = False

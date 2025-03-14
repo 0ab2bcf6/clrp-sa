@@ -16,7 +16,7 @@ class Node(ABC):
 
     type: NodeType = NodeType.BSC
 
-    def __init__(self, name: str, x: int, y: int) -> None:
+    def __init__(self, name: str, x: float, y: float) -> None:
         self.name: str = name
-        self.x: int = x
-        self.y: int = y
+        self.x: float = x
+        self.y: float = y

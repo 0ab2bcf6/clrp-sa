@@ -7,5 +7,5 @@ class DummyZero(Node):
     """Represents a DummyZero in the Solution"""
     type: NodeType = NodeType.DZR
 
-    def __init__(self, name, x, y):
+    def __init__(self, name: str, x: float, y: float) -> None:
         super().__init__(name, x, y)

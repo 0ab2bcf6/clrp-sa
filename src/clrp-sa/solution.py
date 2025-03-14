@@ -90,38 +90,6 @@ class Solution:
         for i in range(number_dummy_zeros):
             self.dummy_zeros.append(DummyZero(f"Z{i}", 0, 0))
 
-    def _reduce_list(self) -> List[Node]:
-        """Create a new list in which consecutive dummy zeros are reduced to a single dummy zero,
-        and remove DZR nodes directly following DPT nodes."""
-        if not self._sequence:
-            return []
-
-        reduced_list: List[Node] = []
-        prev_dzr: bool = False
-
-        for node in self._sequence:
-            if node.type == NodeType.DZR:
-                if not prev_dzr:
-                    reduced_list.append(node)
-                    prev_dzr = True
-            else:
-                reduced_list.append(node)
-                prev_dzr = False
-
-        # Remove Zero directly following a Depot
-        i: int = 0
-        while i < len(reduced_list) - 1:
-            if reduced_list[i].type == NodeType.DPT and reduced_list[i + 1].type == NodeType.DZR:
-                reduced_list.pop(i + 1)
-            else:
-                i += 1
-
-        # Remove trailing nodes until the last node is CSTMR
-        while reduced_list and reduced_list[-1].type != NodeType.CSTMR:
-            reduced_list.pop()
-
-        return reduced_list
-
     def _get_distance(self, node1: Node, node2: Node) -> float:
         """Returns distance between node1 and node2"""
         if node1.type != NodeType.DZR and node2.type != NodeType.DZR:
@@ -173,8 +141,8 @@ class Solution:
         """Calculates the partial cost and required capacity of the subsequence in the reduced sequence from one depot to its last customer"""
 
         partial_cost: float = 0.0
-        depot_capacity: int = sequence[depot_idx].capacity
-        vehicle_capacity: int = self.instance.vehicle_capacity
+        depot_capacity: float = sequence[depot_idx].capacity
+        vehicle_capacity: float = self.instance.vehicle_capacity
 
         last_customer_idx: int = last_idx
         if last_idx >= len(sequence):
@@ -230,3 +198,35 @@ class Solution:
 
         partial_feasible: bool = (depot_capacity >= 0)
         return (partial_cost, partial_feasible)
+    
+    def _reduce_list(self) -> List[Node]:
+        """Create a new list in which consecutive dummy zeros are reduced to a single dummy zero,
+        and remove DZR nodes directly following DPT nodes."""
+        if not self._sequence:
+            return []
+
+        reduced_list: List[Node] = []
+        prev_dzr: bool = False
+
+        for node in self._sequence:
+            if node.type == NodeType.DZR:
+                if not prev_dzr:
+                    reduced_list.append(node)
+                    prev_dzr = True
+            else:
+                reduced_list.append(node)
+                prev_dzr = False
+
+        # Remove Zero directly following a Depot
+        i: int = 0
+        while i < len(reduced_list) - 1:
+            if reduced_list[i].type == NodeType.DPT and reduced_list[i + 1].type == NodeType.DZR:
+                reduced_list.pop(i + 1)
+            else:
+                i += 1
+
+        # Remove trailing nodes until the last node is CSTMR
+        while reduced_list and reduced_list[-1].type != NodeType.CSTMR:
+            reduced_list.pop()
+
+        return reduced_list

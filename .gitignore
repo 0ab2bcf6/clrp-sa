@@ -31,4 +31,4 @@ tests/plots/
 *.nfs*
 *.temp
 
-src/clrp-sa/instances
+# src/clrp-sa/instances

@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 
-from typing import List, Dict, Tuple
+from typing import Dict, List, Tuple, Optional
 
+from clrpsolver import CLRPSolver
 from customer import Customer
 from depot import Depot
-from dummyzero import DummyZero
-from node import Node, NodeType
 from instance import Instance
 from logger import Logger
+from node import Node
 from solution import Solution
 
 
-class GreedySolver:
+class GreedySolver(CLRPSolver):
     """Greedy Solver for a CLRP Instance"""
 
     def __init__(self, logger: Logger) -> None:
-        self._logger: Logger = logger
+        super().__init__(logger)
 
     def solve(self, instance: Instance) -> Solution:
         """Returns greedy Solution for the given Instance"""
@@ -32,7 +32,7 @@ class GreedySolver:
             ]
 
             for customer in unassigned_customers:
-                closest_depot: Depot = None
+                closest_depot: Optional[Depot] = None
                 min_distance: float = float('inf')
 
                 for depot in unused_depots:
@@ -50,13 +50,13 @@ class GreedySolver:
                 len(unused_depots[depot]), depot.capacity))
 
             solution.append_node(selected_depot)
-            cap: int = selected_depot.capacity
+            cap: float = selected_depot.capacity
             last_appended_node: Node = selected_depot
             current_route_cap: int = instance.vehicle_capacity
             is_cap_reached: bool = False
             while not is_cap_reached:
                 min_distance: float = float('inf')
-                selected_customer: Customer = None
+                selected_customer: Optional[Customer] = None
                 for customer in unused_depots[selected_depot]:
                     customer_distance = instance.get_distance(
                         customer[0], last_appended_node)
@@ -64,13 +64,13 @@ class GreedySolver:
                         min_distance = customer_distance
                         selected_customer = customer[0]
 
-                if selected_customer == None:
+                if not selected_customer:
                     used_depots.append(selected_depot)
                     is_cap_reached = True
                     break
 
-                if cap - selected_customer.demand > 0:
-                    if current_route_cap - selected_customer.demand < 0:
+                if selected_customer and cap - selected_customer.demand > 0:
+                    if selected_customer and current_route_cap - selected_customer.demand < 0:
                         solution.append_dummy_zero()
                         current_route_cap = instance.vehicle_capacity
                         last_appended_node = selected_depot
