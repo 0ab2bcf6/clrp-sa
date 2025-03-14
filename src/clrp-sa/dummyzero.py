@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from node import NodeType, Node
+from .node import NodeType, Node
 
 
 class DummyZero(Node):

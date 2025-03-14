@@ -3,8 +3,9 @@
 This repository provides a framework for solving the Capacitated Location-Routing Problem (CLRP) using different solver methods. It includes instance data, a data loader, and implemented solvers such as a simple greedy algorithm and a simulated annealing (SA) approach.
 
 # TODOs
-- fix cost function in `solution.py`
-- implement `gurobisolver.py`
+- fix cost function in `solution.py`: there's a bug in the cost function that causes travel cost from depot to first customer in secondary routes to not be calculated 
+- implement `gurobisolver.py`: as for now, the code is gpt generated and in parts just wrong and not functional
+- meaningful and consistent integration of `Logger` in solver classes
 
 ## Features
 - **DataLoader**: Loads problem instances from predefined files.
@@ -63,7 +64,7 @@ class MySolver(CLRPsolver):
     def __init__(self, logger: Logger) -> None:
         super().__init__(logger)
 
-    def solve(self) -> Solution:
+    def solve(self, instance: Instance) -> Solution:
         self.logger.log("Solving instance: " + instance.name)
         # Implement solver logic here
         return Solution()

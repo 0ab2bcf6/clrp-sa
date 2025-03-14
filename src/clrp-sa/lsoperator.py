@@ -6,11 +6,11 @@ from typing import Dict, List, Optional, Tuple, Union
 from enum import Enum
 from abc import ABC, abstractmethod
 
-from node import Node, NodeType
 from customer import Customer
 from depot import Depot
 from dummyzero import DummyZero
 from logger import Logger
+from node import Node, NodeType
 from solution import Solution
 
 

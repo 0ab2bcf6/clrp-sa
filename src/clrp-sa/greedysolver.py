@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+"""
+This module defines the GreedySolver class, which implements a greedy approach to solving the Capacitated Location Routing Problem (CLRP).
+
+Classes:
+    GreedySolver: A greedy algorithm-based solver for the CLRP.
+"""
 
 from typing import Dict, List, Tuple, Optional
 
@@ -12,7 +18,8 @@ from solution import Solution
 
 
 class GreedySolver(CLRPSolver):
-    """Greedy Solver for a CLRP Instance"""
+    """Greedy Solver for a CLRP Instance."""
+
 
     def __init__(self, logger: Logger) -> None:
         super().__init__(logger)

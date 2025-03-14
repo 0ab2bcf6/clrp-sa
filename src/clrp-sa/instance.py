@@ -1,24 +1,30 @@
 #!/usr/bin/env python3
+"""
+This module defines the Instance class, which represents an instance of the Capacitated Location Routing Problem (CLRP).
+
+Classes:
+    Instance: A class to model an instance for the CLRP.
+"""
 
 import math
-
 from typing import Dict, List, Tuple
 
-from node import Node
 from customer import Customer
 from depot import Depot
+from node import Node
 
 
 class Instance:
-    """Represents an instance for a CLRP Problem"""
+    """Represents an instance for a CLRP Problem."""
 
-    def __init__(self, name: str, depots: List[Depot], customers: List[Customer], vehicle_capacity: int, route_setup_cost: int) -> None:
+
+    def __init__(self, name: str, depots: List[Depot], customers: List[Customer], vehicle_capacity: float, route_setup_cost: float) -> None:
         self.name: str = name
         self.depots: List[Depot] = depots
         self.customers: List[Customer] = customers
         self.size: int = len(self.depots) + len(self.customers)
-        self.vehicle_capacity: int = vehicle_capacity
-        self.route_setup_cost: int = route_setup_cost
+        self.vehicle_capacity: float = vehicle_capacity
+        self.route_setup_cost: float = route_setup_cost
         self.distance_matrix: Dict[Tuple[Node, Node],
                                    float] = self._create_distance_matrix()
 

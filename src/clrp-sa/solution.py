@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
+"""
+This module defines the Solution class, which represents a solution for the Capacitated Location Routing Problem (CLRP).
 
-from typing import List, Tuple
+Classes:
+    Solution: A class to model a solution for the CLRP.
+"""
 
 import math
+from typing import List, Tuple
 
-from node import Node, NodeType
-from instance import Instance
 from customer import Customer
 from depot import Depot
 from dummyzero import DummyZero
+from instance import Instance
+from node import Node, NodeType
 
 
 class Solution:
