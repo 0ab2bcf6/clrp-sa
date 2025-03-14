@@ -14,9 +14,10 @@ TSolution = TypeVar('TSolution', bound=Solution)
 class CLRPSolver(Generic[TSolution], ABC):
     """abstract base class for CLRP Solver"""
 
-    def __init__(self, logger: Logger) -> None:
+    def __init__(self, name: str, logger: Logger) -> None:
         """init function of superclass"""
         self.logger: Logger = logger
+        self.name: str = name
 
     @abstractmethod
     def solve(self) -> TSolution:

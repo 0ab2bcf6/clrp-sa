@@ -2,6 +2,7 @@
 
 from typing import List, Tuple
 
+import copy
 import math
 import random
 import time
@@ -15,8 +16,8 @@ from hrstcsolution import HRSTCSolution
 
 class CLRPSASolver(CLRPSolver[HRSTCSolution]):
 
-    def __init__(self, logger: Logger, solution: HRSTCSolution) -> None:
-        super().__init__(logger)
+    def __init__(self, name: str, logger: Logger, solution: HRSTCSolution) -> None:
+        super().__init__(name, logger)
 
         self.sa_parameters: SimulatedAnnealingParameters = SimulatedAnnealingParameters(
             a=0.98,
@@ -36,7 +37,7 @@ class CLRPSASolver(CLRPSolver[HRSTCSolution]):
             SwapOperator(logger),
             InsertOperator(logger)
         ]
-        self.inital_solution: HRSTCSolution = solution
+        self.inital_solution: HRSTCSolution = copy.deepcopy(solution)
 
     def solve(self) -> HRSTCSolution:
         """Returns the given Solution"""
@@ -48,7 +49,7 @@ class CLRPSASolver(CLRPSolver[HRSTCSolution]):
         TF: float = self.sa_parameters.TF
         N: int = self.sa_parameters.Nnon_improving
         I: int = self.sa_parameters.Iiter * \
-            len(self.inital_solution.get_solution())
+            len(self.inital_solution.instance.nodes)
 
         i_count: int = 0
         n_count: int = 0
@@ -95,29 +96,28 @@ class CLRPSASolver(CLRPSolver[HRSTCSolution]):
                 n_count += 1
                 current_temp = A * current_temp
 
-                if True:
-                    # perform local search
-                    (best_sol_cost, _) = best_solution.get_quality()
-                    (current_solution, is_feasible) = self.local_search[0].apply(
+                # perform local search
+                (best_sol_cost, _) = best_solution.get_quality()
+                (current_solution, is_feasible) = self.local_search[0].apply(
+                    best_solution)
+                (curr_sol_cost, _) = current_solution.get_quality()
+
+                if is_feasible:
+                    (current_solution, is_feasible) = self.local_search[1].apply(
+                        current_solution)
+                    (curr_sol_cost, _) = current_solution.get_quality()
+
+                    if is_feasible:
+                        if curr_sol_cost < best_sol_cost:
+                            best_solution = current_solution
+                else:
+                    (current_solution, is_feasible) = self.local_search[1].apply(
                         best_solution)
                     (curr_sol_cost, _) = current_solution.get_quality()
 
                     if is_feasible:
-                        (current_solution, is_feasible) = self.local_search[1].apply(
-                            current_solution)
-                        (curr_sol_cost, _) = current_solution.get_quality()
-
-                        if is_feasible:
-                            if curr_sol_cost < best_sol_cost:
-                                best_solution = current_solution
-                    else:
-                        (current_solution, is_feasible) = self.local_search[1].apply(
-                            best_solution)
-                        (curr_sol_cost, _) = current_solution.get_quality()
-
-                        if is_feasible:
-                            if curr_sol_cost < best_sol_cost:
-                                best_solution = current_solution
+                        if curr_sol_cost < best_sol_cost:
+                            best_solution = current_solution
 
             if current_temp <= TF or n_count >= N:
                 return best_solution

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import logging
+from datetime import datetime
 from typing import List
 from pathlib import Path
 
@@ -14,11 +16,51 @@ class Logger:
         self.indent_level: int = 0
         self.indent_char: str = "  "
 
+        self.logger: logging.Logger = logging.getLogger(name)
+        self.logger.setLevel(logging.INFO)
+
+        self.logger.handlers.clear()
+
+        console_handler = logging.StreamHandler()
+        formatter = logging.Formatter(
+            '%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S'
+        )
+        console_handler.setFormatter(formatter)
+        self.logger.addHandler(console_handler)
+
+    def info(self, solver: str, message: str) -> None:
+        indent = self.indent_char * self.indent_level
+        log_message = f"{indent}{message}"
+        self.logger.info(log_message)
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        stored_message = f"{timestamp} {indent}[INFO] {self.name}: {solver} - {message}"
+        self.logs.append(stored_message)
+        if self.log_output:
+            print(stored_message)
+
+    def warning(self, message: str) -> None:
+        indent = self.indent_char * self.indent_level
+        log_message = f"{indent}{message}"
+        self.logger.warning(log_message)
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        stored_message = f"{timestamp} {indent}[WARNING] {self.name}: {message}"
+        self.logs.append(stored_message)
+        if self.log_output:
+            print(stored_message)
+
+    def error(self, message: str) -> None:
+        indent = self.indent_char * self.indent_level
+        log_message = f"{indent}{message}"
+        self.logger.error(log_message)
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        stored_message = f"{timestamp} {indent}[ERROR] {self.name}: {message}"
+        self.logs.append(stored_message)
+        if self.log_output:
+            print(stored_message)
+
     def log(self, msg: str) -> None:
         """Logs a message with a specified indentation level"""
-
-        if not self.log_output:
-            return
 
         indent = self.indent_char * self.indent_level
         self.logs.append(f"{indent}{msg}")
@@ -36,8 +78,6 @@ class Logger:
 
     def print_logs_to_file(self) -> None:
         """Writes all logged messages to a file"""
-        if not self.log_output:
-            return
 
         file_path = Path(self.name + ".txt")
         file_path.parent.mkdir(parents=True, exist_ok=True)

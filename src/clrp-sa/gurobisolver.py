@@ -23,21 +23,22 @@ from logger import Logger
 
 
 class GurobiSolver(CLRPSolver[GRBSolution]):
-    """A solver for the CLRP utilizing the Gurobi optimization engine."""
+    """A solver for the CLRP utilizing the Gurobi optimization software."""
 
-    def __init__(self, logger: Logger) -> None:
-        super().__init__(logger)
+    def __init__(self, name: str, logger: Logger) -> None:
+        super().__init__(name, logger)
 
     def solve(self, instance: Instance, time_limit: int = 600) -> GRBSolution:
         """Solves the given Instance using the Gurobi Optimizer"""
         self._instance = instance
+
         model = gp.Model(f"CLRP_{instance.name}")
         model.setParam('TimeLimit', time_limit)
 
         # Sets, be very careful with the indexes when using variables in J
         I = range(len(instance.depots))  # Depots
         J = range(len(instance.customers))  # Customers
-        V = range(len([instance.depots + instance.customers]))  # Nodes
+        V = range(len([instance.nodes]))  # Nodes
         # some max number of Vehicles
         K = range(math.ceil(len(instance.customers)/2))
 
@@ -93,15 +94,14 @@ class GurobiSolver(CLRPSolver[GRBSolution]):
 
         # Customer assignment depends on depot opening
         for i in I:
-            model.addConstr(gp.quicksum(f[i][j + len(I)] * instance.customers[j].demand for j in J) <= W[i] * y[i],
-                            name=f"c4_i{i}_j{j}")
+            model.addConstr(gp.quicksum(
+                f[i][j + len(I)] * instance.customers[j].demand for j in J) <= W[i] * y[i], name=f"c4_i{i}_j{j}")
 
         # Flow conservation constraint
         for i in V:
             for k in K:
-                model.addConstr(gp.quicksum(x[i][j][k] for j in V) == gp.quicksum(x[j][i][k] for j in V),
-                                name=f"c5_i{i}_k{k}"
-                                )
+                model.addConstr(gp.quicksum(x[i][j][k] for j in V) == gp.quicksum(
+                    x[j][i][k] for j in V), name=f"c5_i{i}_k{k}")
 
         for k in K:
             model.addConstr(gp.quicksum(x[i][j + len(I)][k]

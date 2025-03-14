@@ -21,8 +21,8 @@ from hrstcsolution import HRSTCSolution
 class GreedySolver(CLRPSolver[HRSTCSolution]):
     """Greedy Solver for a CLRP Instance."""
 
-    def __init__(self, logger: Logger) -> None:
-        super().__init__(logger)
+    def __init__(self, name: str, logger: Logger) -> None:
+        super().__init__(name, logger)
 
     def solve(self, instance: Instance) -> HRSTCSolution:
         """Returns greedy Solution for the given Instance"""
