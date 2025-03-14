@@ -6,6 +6,7 @@ Classes:
     GreedySolver: A greedy algorithm-based solver for the CLRP.
 """
 
+import time
 from typing import Dict, List, Tuple, Optional
 
 from clrpsolver import CLRPSolver
@@ -14,23 +15,23 @@ from depot import Depot
 from instance import Instance
 from logger import Logger
 from node import Node
-from solution import Solution
+from hrstcsolution import HRSTCSolution
 
 
-class GreedySolver(CLRPSolver):
+class GreedySolver(CLRPSolver[HRSTCSolution]):
     """Greedy Solver for a CLRP Instance."""
-
 
     def __init__(self, logger: Logger) -> None:
         super().__init__(logger)
 
-    def solve(self, instance: Instance) -> Solution:
+    def solve(self, instance: Instance) -> HRSTCSolution:
         """Returns greedy Solution for the given Instance"""
 
-        solution: Solution = Solution(instance)
+        solution: HRSTCSolution = HRSTCSolution(instance)
         used_depots: List[Depot] = []
         assigned_customers: List[Customer] = []
 
+        start_time = time.time()
         while len(assigned_customers) < len(instance.customers) and len(used_depots) < len(instance.depots):
             unused_depots: Dict[Depot, List[Tuple[Customer, float]]] = {
                 depot: [] for depot in instance.depots if depot not in used_depots}
@@ -48,7 +49,8 @@ class GreedySolver(CLRPSolver):
                         min_distance = distance
                         closest_depot = depot
 
-                unused_depots[closest_depot].append((customer, min_distance))
+                if closest_depot:
+                    unused_depots[closest_depot].append((customer, min_distance))
 
             for depot in unused_depots:
                 unused_depots[depot].sort(key=lambda x: x[1])
@@ -59,7 +61,7 @@ class GreedySolver(CLRPSolver):
             solution.append_node(selected_depot)
             cap: float = selected_depot.capacity
             last_appended_node: Node = selected_depot
-            current_route_cap: int = instance.vehicle_capacity
+            current_route_cap: float = instance.vehicle_capacity
             is_cap_reached: bool = False
             while not is_cap_reached:
                 min_distance: float = float('inf')
@@ -99,4 +101,6 @@ class GreedySolver(CLRPSolver):
                 solution.append_node(depot)
 
         solution.finish_initial_solution()
+        end_time = time.time() - start_time
+        solution.set_time(end_time)
         return solution

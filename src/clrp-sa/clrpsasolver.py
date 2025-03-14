@@ -4,17 +4,18 @@ from typing import List, Tuple
 
 import math
 import random
+import time
 
 from clrpsolver import CLRPSolver
 from logger import Logger
 from lsoperator import LocalSearchOperator, InsertOperator, SwapOperator, TwoOptOperator
 from saparameters import SimulatedAnnealingParameters
-from solution import Solution
+from hrstcsolution import HRSTCSolution
 
 
-class CLRPSASolver(CLRPSolver):
+class CLRPSASolver(CLRPSolver[HRSTCSolution]):
 
-    def __init__(self, logger: Logger, solution: Solution) -> None:
+    def __init__(self, logger: Logger, solution: HRSTCSolution) -> None:
         super().__init__(logger)
 
         self.sa_parameters: SimulatedAnnealingParameters = SimulatedAnnealingParameters(
@@ -35,9 +36,9 @@ class CLRPSASolver(CLRPSolver):
             SwapOperator(logger),
             InsertOperator(logger)
         ]
-        self.inital_solution: Solution = solution
+        self.inital_solution: HRSTCSolution = solution
 
-    def solve(self) -> Solution:
+    def solve(self) -> HRSTCSolution:
         """Returns the given Solution"""
 
         A: float = self.sa_parameters.a
@@ -52,9 +53,10 @@ class CLRPSASolver(CLRPSolver):
         i_count: int = 0
         n_count: int = 0
         current_temp: float = T0
-        best_solution: Solution = self.inital_solution
-        current_solution: Solution = self.inital_solution
+        best_solution: HRSTCSolution = self.inital_solution
+        current_solution: HRSTCSolution = self.inital_solution
 
+        start_time = time.time()
         while current_temp > TF:
             i_count += 1
 
@@ -120,4 +122,6 @@ class CLRPSASolver(CLRPSolver):
             if current_temp <= TF or n_count >= N:
                 return best_solution
 
+        end_time = time.time() - start_time
+        best_solution.set_time(end_time)
         return best_solution

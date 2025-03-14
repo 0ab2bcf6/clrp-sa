@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 
-
-from typing import List, Tuple, Dict
 from abc import ABC, abstractmethod
+from typing import Generic, TypeVar
 
 from instance import Instance
 from logger import Logger
 from solution import Solution
 
+# Define a TypeVar constrained to Solution
+TSolution = TypeVar('TSolution', bound=Solution)
 
-class CLRPSolver(ABC):
+
+class CLRPSolver(Generic[TSolution], ABC):
     """abstract base class for CLRP Solver"""
 
     def __init__(self, logger: Logger) -> None:
@@ -17,6 +19,6 @@ class CLRPSolver(ABC):
         self.logger: Logger = logger
 
     @abstractmethod
-    def solve(self) -> Solution:
-        """returns a Solution of Instance using the class-specific solving method"""
+    def solve(self) -> TSolution:
+        """Abstract method to solve the CLRP and return a Solution subclass."""
         pass

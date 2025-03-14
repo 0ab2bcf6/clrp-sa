@@ -8,29 +8,31 @@ Classes:
 
 import math
 from itertools import combinations
-from typing import List, Union
+import time
+from typing import List
 
 import gurobipy as gp
 from gurobipy import GRB, Var, LinExpr
 
+from clrpsolver import CLRPSolver
 from customer import Customer
 from depot import Depot
+from grbsolution import GRBSolution
 from instance import Instance
 from logger import Logger
-from solution import Solution
-from clrpsolver import CLRPSolver
 
 
-class GurobiSolver(CLRPSolver):
+class GurobiSolver(CLRPSolver[GRBSolution]):
     """A solver for the CLRP utilizing the Gurobi optimization engine."""
 
     def __init__(self, logger: Logger) -> None:
         super().__init__(logger)
 
-    def solve(self, instance: Instance) -> Solution:
+    def solve(self, instance: Instance, time_limit: int = 600) -> GRBSolution:
         """Solves the given Instance using the Gurobi Optimizer"""
         self._instance = instance
         model = gp.Model(f"CLRP_{instance.name}")
+        model.setParam('TimeLimit', time_limit)
 
         # Sets, be very careful with the indexes when using variables in J
         I = range(len(instance.depots))  # Depots
@@ -54,10 +56,12 @@ class GurobiSolver(CLRPSolver):
                 for k in K:
                     x[i][j].append(model.addVar(
                         vtype=GRB.BINARY, name=f"x_i{i}_j{j}_k{k}"))
+        # x[i][j][k] = 1, if arc from node i to node j is traversed by vehicle k, =0 otherwise
 
         y: List[Var] = []
         for i in I:
             y.append(model.addVar(vtype=GRB.BINARY, name=f"y_i{i}"))
+        # y[i] =1 if depot i gets opened, =0 otherwise
 
         f: List[List[Var]] = []
         for i in I:
@@ -65,6 +69,7 @@ class GurobiSolver(CLRPSolver):
             for j in V:
                 f[i].append(model.addVar(
                     vtype=GRB.BINARY, name=f"f_i{i}_j{j}"))
+        # f[i][j] = 1, if customer(node) j is assigned to depot(node) i, =0 otherwise
 
         # Objective Function
         opening_cost: LinExpr = gp.quicksum(O[i]*y[i] for i in I)
@@ -103,15 +108,14 @@ class GurobiSolver(CLRPSolver):
                             for j in J for i in I) <= 1, name=f"c6_k{k}")
 
         # Subtour elimination
+        J_in_V = range(len(I), len(V))
         for k in K:
-            for r in range(1, len(J) + 1):
-                for S in combinations(J, r):
-                    S = list(S)
-                    if len(S) >= 2:
-                        S_in_V = [i + len(I) for i in S]
-                        model.addConstr(
-                            gp.quicksum(
-                                x[i][j][k] for i in S_in_V for j in S_in_V if i != j) <= len(S) - 1, name=f"subtour_elim_k{k}_S{tuple(S)}")
+            for r in range(1, len(J_in_V) + 1):  # r is the size of the subset
+                for S in combinations(J_in_V, r):
+                    S_l: List[int] = list(S)
+                    if len(S_l) >= 2:
+                        model.addConstr(gp.quicksum(x[i][j][k] for i in S_l for j in S_l if i != j) <= len(
+                            S_l) - 1, name=f"c7_k{k}_S{tuple(S_l)}")
 
         # only include customer into same routes if customers are assigned to the same depot
         for k in K:
@@ -128,17 +132,27 @@ class GurobiSolver(CLRPSolver):
                     )
 
         # Solve the model
+        start_time = time.time()
         model.optimize()
+        end_time = time.time() - start_time
+        solution = GRBSolution(instance)
 
-        # Extract the solution
-        solution = Solution(instance)
-        if model.status == GRB.OPTIMAL:
-            solution.depots_opened = [i for i in I if y[i].x > 0.5]
-            solution.customer_assignment = {
-                (i, j): f[i, j].x for i in I for j in J}
-            solution.routes = {
-                (i, j, k): x[i, j, k].x for i in I for j in J for k in K}
+        # Check the optimization status
+        if model.status == gp.GRB.OPTIMAL:
+            print("Optimal solution found!")
+            obj_value = model.ObjVal
+            solution.set_solution(True, obj_value)
+        elif model.SolCount > 0:
+            # Handle cases where a feasible solution was found but the time limit elapsed
+            print("Time limit reached. Best feasible solution used.")
+            obj_value = model.ObjVal
+            solution.set_solution(False, obj_value)
+        else:
+            # Handle cases where no feasible solution was found
+            print("No feasible solution found within the time limit.")
+            solution.set_solution(False, -1.0)
 
+        solution.set_time(end_time)
         return solution
 
     def _c(self, node1: int, node2: int) -> float:

@@ -11,7 +11,7 @@ from depot import Depot
 from dummyzero import DummyZero
 from logger import Logger
 from node import Node, NodeType
-from solution import Solution
+from hrstcsolution import HRSTCSolution
 
 
 class OperatorType(Enum):
@@ -29,18 +29,18 @@ class LocalSearchOperator(ABC):
         self._affected_nodes: Tuple[Optional[Node], Optional[Node]] = (None, None)
 
     @abstractmethod
-    def apply(self, solution: Solution) -> Tuple[Solution, bool]:
+    def apply(self, solution: HRSTCSolution) -> Tuple[HRSTCSolution, bool]:
         """Applies the Operator-specific Operation to a given Input Solution"""
         pass
 
-    def init_new_solution(self, solution: Solution) -> Solution:
+    def init_new_solution(self, solution: HRSTCSolution) -> HRSTCSolution:
         """initalizes new solution object"""
-        new_solution: Solution = Solution(solution.instance)
+        new_solution: HRSTCSolution = HRSTCSolution(solution.instance)
         new_solution.dummy_zeros = []
         new_solution._sequence = solution.get_solution()[:]
         return new_solution
 
-    def get_old_solution(self, solution: Solution) -> Tuple[Solution, bool]:
+    def get_old_solution(self, solution: HRSTCSolution) -> Tuple[HRSTCSolution, bool]:
         (_, old_solution_feasible) = solution.get_quality()
         return (solution, old_solution_feasible)
 
@@ -55,11 +55,11 @@ class TwoOptOperator(LocalSearchOperator):
     def __init__(self, logger: Logger) -> None:
         super().__init__(logger)
 
-    def apply(self, solution: Solution) -> Tuple[Solution, bool]:
+    def apply(self, solution: HRSTCSolution) -> Tuple[HRSTCSolution, bool]:
         """Applies the 2-Opt Operation to a given Input Solution"""
         super().set_affected_nodes(None, None)
 
-        new_solution: Solution = super().init_new_solution(solution)
+        new_solution: HRSTCSolution = super().init_new_solution(solution)
         candidate_depots: List[Tuple[Depot, int]] = []
         customers_of_depot: Dict[Depot, List[Tuple[Customer, int]]] = {}
         sequence = new_solution.get_solution()
@@ -114,11 +114,11 @@ class InsertOperator(LocalSearchOperator):
     def __init__(self, logger: Logger) -> None:
         super().__init__(logger)
 
-    def apply(self, solution: Solution) -> Tuple[Solution, bool]:
+    def apply(self, solution: HRSTCSolution) -> Tuple[HRSTCSolution, bool]:
         """Applies the Insert Operation to a given Input Solution"""
         super().set_affected_nodes(None, None)
 
-        new_solution: Solution = super().init_new_solution(solution)
+        new_solution: HRSTCSolution = super().init_new_solution(solution)
         insert_candidates: List[Tuple[Node, int]] = []
         sequence: List[Node] = new_solution.get_solution()
 
@@ -156,11 +156,11 @@ class SwapOperator(LocalSearchOperator):
     def __init__(self, logger: Logger) -> None:
         super().__init__(logger)
 
-    def apply(self, solution: Solution) -> Tuple[Solution, bool]:
+    def apply(self, solution: HRSTCSolution) -> Tuple[HRSTCSolution, bool]:
         """Applies the Swap Operation to a given Input Solution"""
         super().set_affected_nodes(None, None)
 
-        new_solution: Solution = super().init_new_solution(solution)
+        new_solution: HRSTCSolution = super().init_new_solution(solution)
         swap_candidates_cstmr: List[Tuple[Node, int]] = []
         swap_candidates_dpt: List[Tuple[Node, int]] = []
         sequence: List[Node] = new_solution.get_solution()
