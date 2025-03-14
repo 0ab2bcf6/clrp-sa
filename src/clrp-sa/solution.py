@@ -37,6 +37,10 @@ class Solution:
         self._sequence = sequence
         self._calculate_cost()
 
+    def set_grb_solution(self, sequence: List[Node], cost: float) -> None:
+        self._sequence = sequence[:]
+        self._cost = cost
+
     def is_valid_solution(self) -> bool:
         """Returns true if solution sequence has no customer before the first depot"""
         seen_depot: bool = False
@@ -203,7 +207,7 @@ class Solution:
 
         partial_feasible: bool = (depot_capacity >= 0)
         return (partial_cost, partial_feasible)
-    
+
     def _reduce_list(self) -> List[Node]:
         """Create a new list in which consecutive dummy zeros are reduced to a single dummy zero,
         and remove DZR nodes directly following DPT nodes."""

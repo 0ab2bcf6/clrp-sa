@@ -7,7 +7,7 @@ Classes:
 """
 
 import math
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 from customer import Customer
 from depot import Depot
@@ -22,6 +22,7 @@ class Instance:
         self.name: str = name
         self.depots: List[Depot] = depots
         self.customers: List[Customer] = customers
+        self.nodes: List[Union[Depot, Customer]] = depots + customers
         self.size: int = len(self.depots) + len(self.customers)
         self.vehicle_capacity: float = vehicle_capacity
         self.route_setup_cost: float = route_setup_cost
@@ -33,7 +34,7 @@ class Instance:
 
     def _create_distance_matrix(self) -> Dict[Tuple[Node, Node], float]:
         """Creates a distance matrix for all nodes."""
-        nodes: List[Node] = self.depots + self.customers
+        nodes: List[Union[Depot, Customer]] = self.depots + self.customers
         distance_matrix: Dict[Tuple[Node, Node], float] = {}
 
         for i, node1 in enumerate(nodes):
@@ -53,3 +54,7 @@ class Instance:
         print("Distance Matrix:")
         for (node1, node2), distance in self.distance_matrix.items():
             print(f"From {node1.name} to {node2.name}: {distance}")
+    
+    def get_c(self, idx1: int, idx2: int) -> float:
+        """this method is only ment to be used in GurobiSolver"""
+        return self.get_distance(self.nodes[idx1], self.nodes[idx2])
