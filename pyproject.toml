@@ -1,11 +1,11 @@
 [project]
 name = "clrp-sa"
 requires-python = ">=3.13"
-description = "Default template for python projects."
+description = "A framework for CLRP instances and solvers."
 readme = "README.md"
 authors = [{name = "0ab2bcf6", email = "simonm96@gmx.de"}]
 classifiers = [
-    "License :: OSI Approved :: 0BSD",
+    "License :: OSI Approved :: 2BSD",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",

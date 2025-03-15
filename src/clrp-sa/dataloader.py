@@ -57,7 +57,8 @@ class DataLoader:
         """
         try:
             with file_path.open('r') as f:
-                lines = [line.strip() for line in f.readlines() if line.strip()]  # Remove empty lines
+                lines = [line.strip() for line in f.readlines()
+                         if line.strip()]  # Remove empty lines
 
                 # Parse number of customers and depots
                 n_customers = int(lines[0])
@@ -159,8 +160,8 @@ class DataLoader:
     def get_dataset_names(self) -> List[str]:
         """Return a list of available dataset names."""
         return list(self.instances.keys())
-    
-    def get_dataset_by_name(self, dataset_name:str) -> Optional[Instance]:
+
+    def get_dataset_by_name(self, dataset_name: str) -> Optional[Instance]:
         """Returns an instance matching the instance dataset_name"""
         return self.instances_by_name.get(dataset_name, None)
 
