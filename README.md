@@ -1,7 +1,7 @@
 # Capacitated Location-Routing Problem (CLRP) Solver
 
 [![License: BSD-2-Clause](https://img.shields.io/badge/License-BSD--2--Clause-blue.svg)](https://opensource.org/licenses/BSD-2-Clause)  
-[![Python Version](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)  
+[![Python Version](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org/)
 
 This repository provides a framework for solving the Capacitated Location-Routing Problem (CLRP) using different interfaces and solver methods. It includes instance data, a data loader, and implemented solvers such as a simple greedy algorithm, a solver using the gurobi optimizer and a simulated annealing (SA) approach.
 
