@@ -103,8 +103,8 @@ class MyHeuristicSolver(CLRPsolver[HRSTCSolution]):
 ## Logging
 Each solver should integrate logging to track progress. Use the `Logger` class to store and export logs.
 
-## License
-This project is licensed under the 2BSD license License.
+## License  
+This project is licensed under the **BSD 2-Clause License**. See the [LICENSE](./LICENSE) file for details.  
 
 ## Contact
 For issues or contributions, feel free to open an issue or submit a pull request!
