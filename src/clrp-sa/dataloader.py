@@ -18,9 +18,6 @@ class DataLoader:
     def __init__(self) -> None:
         """
         Initialize the DataLoader by parsing all instance files in the given directory.
-
-        Args:
-            data_dir (str): Path to the directory containing instance folders (e.g., 'instances/').
         """
         # self.data_dir = Path(data_dir)  # Convert to Path object
         self.data_dir: Path = Path(SCRIPT_DIR, "instances")
