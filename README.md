@@ -31,23 +31,41 @@ python __main__.py
 
 ### Example Workflow in `__main__.py`
 ```python
+from typing import List
+
+
+from clrpsasolver import CLRPSASolver
+from dataloader import DataLoader
+from grbsolution import GRBSolution
+from greedysolver import GreedySolver
+from gurobisolver import GurobiSolver
+from hrstcsolution import HRSTCSolution
+from instance import Instance
+from logger import Logger
+
 if __name__ == "__main__":
+
     instances: List[Instance] = DataLoader().get_instances()
-    # Filter for specific instances if needed
-    selected_instance: Instance = instances[0]
+    # filter for specific instances here
+    selected_instance: Instance = instances[0] # just use the first instance
 
-    # Initialize logger
-    logger: Logger = Logger(selected_instance.name, True)
+    # include logger in solver classes as needed
+    # use the Greedy Solver
+    logger: Logger = Logger(selected_instance.name + "- Greedy", True)
+    greedy_solver: GreedySolver = GreedySolver("Greedy", logger)
+    initial_solution: HRSTCSolution = greedy_solver.solve(selected_instance)
+    logger.print_logs_to_file()
 
-    # Solve using the greedy solver
-    greedy_solver: GreedySolver = GreedySolver(logger)
-    initial_solution: Solution = greedy_solver.solve(selected_instance)
-
-    # Solve using CLRP-SA solver
-    clrpsa_solver: CLRPSASolver = CLRPSASolver(logger, initial_solution)
-    best_solution: Solution = clrpsa_solver.solve()
-
-    # Save logs
+    # use the Simulated Annealing Solver
+    logger = Logger(selected_instance.name + "- SimAn", True)
+    clrpsa_solver: CLRPSASolver = CLRPSASolver("SimAn", logger, initial_solution)
+    best_solution: HRSTCSolution = clrpsa_solver.solve()
+    logger.print_logs_to_file()
+    
+    # use the Gurobi Solver
+    logger = Logger(selected_instance.name + "- Gurobi", True)
+    gurobi_solver: GurobiSolver = GurobiSolver("Gurobi", logger)
+    gurobi_solution: GRBSolution = gurobi_solver.solve(selected_instance)
     logger.print_logs_to_file()
 ```
 
@@ -67,7 +85,7 @@ class MyHeuristicSolver(CLRPsolver[HRSTCSolution]):
     def __init__(self, name: str, logger: Logger) -> None:
         super().__init__(name, logger)
 
-    def solve(self, instance: Instance) -> Solution:
+    def solve(self, instance: Instance) -> HRSTCSolution:
         solution: HRSTCSolution = HRSTCSolution(instance)
         self.logger.info(f"Starting {self.name} solver")
         start_time = time()
