@@ -1,10 +1,11 @@
 # Capacitated Location-Routing Problem (CLRP) Solver
 
-This repository provides a framework for solving the Capacitated Location-Routing Problem (CLRP) using different solver methods. It includes instance data, a data loader, and implemented solvers such as a simple greedy algorithm and a simulated annealing (SA) approach.
+This repository provides a framework for solving the Capacitated Location-Routing Problem (CLRP) using different interfaces and solver methods. It includes instance data, a data loader, and implemented solvers such as a simple greedy algorithm, a solver using the gurobi optimizer and a simulated annealing (SA) approach.
 
 # TODOs
+- as for now, the code is largely untested.
 - fix cost function in `solution.py`: there's a bug in the cost function that causes travel cost from depot to first customer in secondary routes to not be calculated 
-- implement `gurobisolver.py`: as for now, the code is gpt generated and in parts just wrong and not functional
+- implement `gurobisolver.py`: as for now, the code is untested
 - meaningful and consistent integration of `Logger` in solver classes
 
 ## Features
@@ -51,23 +52,31 @@ if __name__ == "__main__":
 ```
 
 ## Implementing a Custom Solver
-To add a new solver, create a class that implements the `CLRPsolver` abstract base class. Ensure that:
+To add a new solver, create a class that implements the `CLRPsolver` abstract base class and the `Solution` abstract base class. Ensure that:
 1. The solver follows the interface defined in `CLRPsolver`.
-2. Logging is implemented as needed.
+2. The solution following the interface defined in `Solution`
+3. Logging is implemented as needed.
 
 ### Example Custom Solver
 ```python
 from clrpsolver import CLRPsolver
+from hrstcsolution import HRSTCSolution # or implement own solution class
 from logger import Logger
 
-class MySolver(CLRPsolver):
-    def __init__(self, logger: Logger) -> None:
-        super().__init__(logger)
+class MyHeuristicSolver(CLRPsolver[HRSTCSolution]):
+    def __init__(self, name: str, logger: Logger) -> None:
+        super().__init__(name, logger)
 
     def solve(self, instance: Instance) -> Solution:
-        self.logger.log("Solving instance: " + instance.name)
+        solution: HRSTCSolution = HRSTCSolution(instance)
+        self.logger.info(f"Starting {self.name} solver")
+        start_time = time()
+
         # Implement solver logic here
-        return Solution()
+
+        runtime = time() - start_time
+        self.logger.info(f"Solver completed in {runtime:.2f} seconds")
+        return solution
 ```
 
 ## Logging
