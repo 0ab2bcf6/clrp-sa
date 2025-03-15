@@ -32,6 +32,7 @@ class GurobiSolver(CLRPSolver[GRBSolution]):
         """Solves the given Instance using the Gurobi Optimizer"""
         self._instance = instance
 
+        start_time = time.time()
         model = gp.Model(f"CLRP_{instance.name}")
         model.setParam('TimeLimit', time_limit)
 
@@ -132,7 +133,6 @@ class GurobiSolver(CLRPSolver[GRBSolution]):
                     )
 
         # Solve the model
-        start_time = time.time()
         model.optimize()
         end_time = time.time() - start_time
         solution = GRBSolution(instance)
